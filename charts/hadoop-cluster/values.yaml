@@ -1,0 +1,24 @@
+global:
+  registry: ghcr.io/gabjea
+  imagePullSecret: ghcr-secret
+
+hadoopEnv:
+  fsDefaultFS: "hdfs://namenode:9000"
+  resourcemanagerHostname: "resourcemanager"
+  multihomedNetwork: "1"
+  clusterName: "hadoop-team-cluster"
+  jobhistoryAddress: "historyserver:10020"
+  jobhistoryWebappAddress: "historyserver:19888"
+
+nodeRoles:
+  masterKey: "node-role.kubernetes.io/master"
+  masterValue: "true"
+  workerKey: "hadoop-role"
+  workerValue: "worker"
+
+namenode:
+  replicaCount: 1
+  hostPath: "/data/hadoop/name"
+
+workers:
+  hostPath: "/data/hadoop/data"

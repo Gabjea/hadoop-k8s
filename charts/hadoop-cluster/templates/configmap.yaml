@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-hadoop-env
+data:
+  CORE_CONF_fs_defaultFS: {{ .Values.hadoopEnv.fsDefaultFS | quote }}
+  YARN_CONF_yarn_resourcemanager_hostname: {{ .Values.hadoopEnv.resourcemanagerHostname | quote }}
+  MULTIHOMED_NETWORK: {{ .Values.hadoopEnv.multihomedNetwork | quote }}
+  CLUSTER_NAME: {{ .Values.hadoopEnv.clusterName | quote }}
+  MAPRED_CONF_mapreduce_jobhistory_address: {{ .Values.hadoopEnv.jobhistoryAddress | quote }}
+  MAPRED_CONF_mapreduce_jobhistory_webapp_address: {{ .Values.hadoopEnv.jobhistoryWebappAddress | quote }}

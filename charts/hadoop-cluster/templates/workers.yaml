@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: hadoop-workers
+spec:
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      nodeSelector:
+        {{ .Values.nodeRoles.workerKey }}: {{ .Values.nodeRoles.workerValue | quote }}
+      imagePullSecrets:
+      - name: {{ .Values.global.imagePullSecret }}
+      containers:
+      - name: datanode
+        image: "{{ .Values.global.registry }}/hadoop-datanode:latest"
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-hadoop-env
+        volumeMounts:
+        - name: hdfs-data
+          mountPath: /hadoop/dfs/data
+      - name: nodemanager
+        image: "{{ .Values.global.registry }}/hadoop-nodemanager:latest"
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-hadoop-env
+      volumes:
+      - name: hdfs-data
+        hostPath:
+          path: {{ .Values.workers.hostPath }}
