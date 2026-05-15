@@ -17,6 +17,7 @@ hadoopEnv:
 
   HDFS_CONF_dfs_client_use_datanode_hostname: "false"
   HDFS_CONF_dfs_datanode_use_datanode_hostname: "false"
+  HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: "false"
 
 nodeRoles:
   masterKey: "node-role.kubernetes.io/master"

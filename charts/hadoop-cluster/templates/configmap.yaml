@@ -16,3 +16,4 @@ data:
   YARN_CONF_yarn_timeline___service_fs___timeline___store_path: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_fs___timeline___store_path | quote }}
   HDFS_CONF_dfs_client_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_client_use_datanode_hostname | quote }}
   HDFS_CONF_dfs_datanode_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_datanode_use_datanode_hostname | quote }}
+  HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: {{ .Values.hadoopEnv.HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check | quote }}
