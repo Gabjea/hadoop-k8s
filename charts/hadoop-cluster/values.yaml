@@ -12,6 +12,9 @@ hadoopEnv:
 
   JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-universal/"
 
+  HDFS_CONF_dfs_namenode_datanode_registration_ip__hostname__check: "false"
+  HDFS_CONF_dfs_datanode_use_datanode_hostname: "false"
+
 nodeRoles:
   masterKey: "node-role.kubernetes.io/master"
   masterValue: "true"
