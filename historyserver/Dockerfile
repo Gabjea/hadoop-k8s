@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ghcr.io/gabjea/hadoop-base:latest
+FROM  ghcr.io/gabjea/hadoop-base:latest
 
 HEALTHCHECK CMD curl -f http://localhost:8188/ || exit 1
 
