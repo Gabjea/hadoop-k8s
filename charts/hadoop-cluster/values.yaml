@@ -11,8 +11,9 @@ hadoopEnv:
   jobhistoryWebappAddress: "historyserver:19888"
   JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-universal/"
 
-  YARN_CONF_yarn_timeline__service_store__class: "org.apache.hadoop.yarn.server.timeline.FileSystemTimelineStore"
-  YARN_CONF_yarn_timeline__service_fs__timeline__store_path: "/yarn/timeline"
+  YARN_CONF_yarn_timeline___service_store___class: "org.apache.hadoop.yarn.server.timeline.FileSystemTimelineStore"
+  YARN_CONF_yarn_timeline___service_state___store___class: "org.apache.hadoop.yarn.server.timeline.recovery.FileSystemTimelineStateStore"
+  YARN_CONF_yarn_timeline___service_fs___timeline___store_path: "/yarn/timeline"
 
 nodeRoles:
   masterKey: "node-role.kubernetes.io/master"

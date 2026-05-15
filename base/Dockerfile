@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       curl \
       netcat \
       gnupg \
-      less inetutils-ping joe\
+      less \
+      inetutils-ping \
+     joe \
     && rm -rf /var/lib/apt/lists/*
       
 RUN ln -s /usr/lib/jvm/java-8-openjdk-* /usr/lib/jvm/java-8-openjdk-universal

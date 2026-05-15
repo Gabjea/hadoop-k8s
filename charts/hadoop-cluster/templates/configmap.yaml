@@ -11,5 +11,6 @@ data:
   MAPRED_CONF_mapreduce_jobhistory_address: {{ .Values.hadoopEnv.jobhistoryAddress | quote }}
   MAPRED_CONF_mapreduce_jobhistory_webapp_address: {{ .Values.hadoopEnv.jobhistoryWebappAddress | quote }}
   JAVA_HOME: {{ .Values.hadoopEnv.JAVA_HOME | quote }}
-  YARN_CONF_yarn_timeline__service_store__class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline__service_store__class | quote }}
-  YARN_CONF_yarn_timeline__service_fs__timeline__store_path: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline__service_fs__timeline__store_path | quote }}
+  YARN_CONF_yarn_timeline___service_store___class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_store___class | quote }}
+  YARN_CONF_yarn_timeline___service_state___store___class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_state___store___class | quote }}
+  YARN_CONF_yarn_timeline___service_fs___timeline___store_path: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_fs___timeline___store_path | quote }}
