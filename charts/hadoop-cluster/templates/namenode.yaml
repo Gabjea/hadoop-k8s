@@ -16,11 +16,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: namenode
+  name: namenode-public
+  namespace: default
 spec:
   ports:
-  - name: fs
-    port: 9000
   - name: web
     port: 9870
     nodePort: 30870
