@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       less inetutils-ping joe\
     && rm -rf /var/lib/apt/lists/*
       
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+RUN ln -s /usr/lib/jvm/java-8-openjdk-* /usr/lib/jvm/java-8-openjdk-universal
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-universal/
 
 RUN curl -O https://dist.apache.org/repos/dist/release/hadoop/common/KEYS
 

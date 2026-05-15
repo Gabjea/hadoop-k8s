@@ -10,6 +10,8 @@ hadoopEnv:
   jobhistoryAddress: "historyserver:10020"
   jobhistoryWebappAddress: "historyserver:19888"
 
+  JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-universal/"
+
 nodeRoles:
   masterKey: "node-role.kubernetes.io/master"
   masterValue: "true"

@@ -9,3 +9,4 @@ data:
   CLUSTER_NAME: {{ .Values.hadoopEnv.clusterName | quote }}
   MAPRED_CONF_mapreduce_jobhistory_address: {{ .Values.hadoopEnv.jobhistoryAddress | quote }}
   MAPRED_CONF_mapreduce_jobhistory_webapp_address: {{ .Values.hadoopEnv.jobhistoryWebappAddress | quote }}
+  JAVA_HOME: {{ .Values.hadoopEnv.JAVA_HOME | quote }}
