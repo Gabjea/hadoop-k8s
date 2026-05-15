@@ -15,12 +15,13 @@ hadoopEnv:
   CORE_CONF_hadoop_proxyuser_hue_groups: "*"
   CORE_CONF_io_compression_codecs: "org.apache.hadoop.io.compress.SnappyCodec"
 
+  CORE_CONF_dfs_client_use_datanode_hostname: "false"
+  CORE_CONF_dfs_datanode_use_datanode_hostname: "false"
+  CORE_CONF_dfs_namenode_datanode_registration_ip___hostname___check: "false"
+
   # === HDFS CONF ===
   HDFS_CONF_dfs_webhdfs_enabled: "true"
   HDFS_CONF_dfs_permissions_enabled: "false"
-  HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: "false"
-  HDFS_CONF_dfs_client_use_datanode_hostname: "false"
-  HDFS_CONF_dfs_datanode_use_datanode_hostname: "false"
   HDFS_CONF_dfs_blocksize: "524288"
   HDFS_CONF_dfs_namenode_fs___limits_min___block___size: "524288"
 
