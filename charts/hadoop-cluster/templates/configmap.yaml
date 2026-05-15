@@ -4,16 +4,6 @@ metadata:
   name: {{ .Release.Name }}-hadoop-env
   namespace: default
 data:
-  CORE_CONF_fs_defaultFS: {{ .Values.hadoopEnv.fsDefaultFS | quote }}
-  YARN_CONF_yarn_resourcemanager_hostname: {{ .Values.hadoopEnv.resourcemanagerHostname | quote }}
-  MULTIHOMED_NETWORK: {{ .Values.hadoopEnv.multihomedNetwork | quote }}
-  CLUSTER_NAME: {{ .Values.hadoopEnv.clusterName | quote }}
-  MAPRED_CONF_mapreduce_jobhistory_address: {{ .Values.hadoopEnv.jobhistoryAddress | quote }}
-  MAPRED_CONF_mapreduce_jobhistory_webapp_address: {{ .Values.hadoopEnv.jobhistoryWebappAddress | quote }}
-  JAVA_HOME: {{ .Values.hadoopEnv.JAVA_HOME | quote }}
-  YARN_CONF_yarn_timeline___service_store___class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_store___class | quote }}
-  YARN_CONF_yarn_timeline___service_state___store___class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_state___store___class | quote }}
-  YARN_CONF_yarn_timeline___service_fs___timeline___store_path: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_fs___timeline___store_path | quote }}
-  HDFS_CONF_dfs_client_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_client_use_datanode_hostname | quote }}
-  HDFS_CONF_dfs_datanode_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_datanode_use_datanode_hostname | quote }}
-  HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check: {{ .Values.hadoopEnv.HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check | quote }}
+{{- range $key, $value := .Values.hadoopEnv }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
