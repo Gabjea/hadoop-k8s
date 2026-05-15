@@ -1,0 +1,119 @@
+{{- if .Values.seeder.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-seeder-script
+  namespace: default
+data:
+  seed.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "=== STEP 0: Injecting IP-Routing Overrides ==="
+    mkdir -p /tmp/hadoop-config-override
+    cp -r /etc/hadoop/* /tmp/hadoop-config-override/ 2>/dev/null || true
+    
+    cat << 'EOF' > /tmp/hadoop-config-override/hdfs-site.xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <property><name>dfs.client.use.datanode.hostname</name><value>false</value></property>
+        <property><name>dfs.datanode.use.datanode.hostname</name><value>false</value></property>
+    </configuration>
+    EOF
+    
+    cat << 'EOF' > /tmp/hadoop-config-override/core-site.xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <property><name>fs.defaultFS</name><value>hdfs://namenode:9000</value></property>
+    </configuration>
+    EOF
+    
+    # Force all subsequent Hadoop commands in this script to use our override directory
+    export HADOOP_CONF_DIR=/tmp/hadoop-config-override
+
+    echo "=== STEP 1: Waiting for HDFS Cluster Readiness ==="
+    until hdfs dfsadmin -safemode wait; do
+      echo "NameNode is still initializing or in Safe Mode. Retrying in 5 seconds..."
+      sleep 5
+    done
+
+    echo "=== STEP 2: Creating HDFS Directories ==="
+    hdfs dfs -mkdir -p /user/root/input
+    hdfs dfs -mkdir -p /user/root/config
+
+    echo "=== STEP 3: Smart Downloading Books ==="
+    mkdir -p /tmp/gutenberg
+    cd /tmp/gutenberg
+
+    echo "Starting smart downloads for {{ .Values.seeder.bookCount }} books..."
+
+    for i in {1..{{ .Values.seeder.bookCount }}}; do
+      # Download to a temporary file first (using || true so 404s don't crash the script)
+      wget -q -c "https://www.gutenberg.org/ebooks/${i}.txt.utf-8" -O temp.txt || true
+      
+      # Check if the file actually downloaded and isn't empty
+      if [ -s temp.txt ]; then
+        
+        # Look for the line starting with "Title: ", remove \r (using || true for books without titles)
+        raw_title=$(grep -a -m 1 "^Title: " temp.txt | tr -d '\r' || true)
+        
+        if [ -n "$raw_title" ]; then
+          # Strip out "Title: ", replace all non-alphanumeric characters with underscores, and make lowercase
+          clean_title=$(echo "$raw_title" | sed 's/^Title: *//' | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
+          
+          # Cut the filename to a maximum of 50 characters
+          clean_title=${clean_title:0:50}
+          
+          # Rename the temp file to the real book name
+          mv temp.txt "${clean_title}.txt"
+          echo "Downloaded ID $i -> ${clean_title}.txt"
+        else
+          # Fallback
+          mv temp.txt "unknown_book_${i}.txt"
+          echo "Downloaded ID $i -> unknown_book_${i}.txt"
+        fi
+      else
+        # Delete the empty temp file if the ID didn't exist
+        rm -f temp.txt
+      fi
+
+      # NEVER REMOVE THE SLEEP: Protects against IP bans
+      sleep 1
+    done
+
+    echo "=== STEP 4: Creating Stopwords ==="
+    cat << 'EOF' > /tmp/gutenberg/stopwords.txt
+    a
+    an
+    and
+    are
+    as
+    at
+    be
+    by
+    for
+    from
+    has
+    he
+    in
+    is
+    it
+    its
+    of
+    on
+    that
+    the
+    to
+    was
+    were
+    will
+    with
+    EOF
+
+    echo "=== STEP 5: Seeding HDFS Layer ==="
+    # Upload files
+    hdfs dfs -put -f /tmp/gutenberg/*.txt /user/root/input/
+    hdfs dfs -put -f /tmp/gutenberg/stopwords.txt /user/root/config/stopwords.txt
+
+    echo "=== SUCCESS: Distributed Storage Infrastructure Seeded! ==="
+{{- end }}

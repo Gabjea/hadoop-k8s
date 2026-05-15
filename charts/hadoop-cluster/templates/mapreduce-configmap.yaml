@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-mapreduce-script
+  namespace: default
+data:
+  # 1. Your exact Java Code
+  InvertedIndex.java: |
+    import java.io.*;
+    import java.net.URI;
+    import java.util.*;
+    import org.apache.hadoop.conf.Configuration;
+    import org.apache.hadoop.fs.Path;
+    import org.apache.hadoop.io.Text;
+    import org.apache.hadoop.mapreduce.Job;
+    import org.apache.hadoop.mapreduce.Mapper;
+    import org.apache.hadoop.mapreduce.Reducer;
+    import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+    import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+    import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+    public class InvertedIndex {
+      public static class TokenizerMapper extends Mapper<Object, Text, Text, Text> {
+        private Text word = new Text();
+        private Text documentAndLine = new Text();
+        private Set<String> stopWords = new HashSet<>();
+        private String fileName;
+        private long lineNumber = 0;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            FileSplit split = (FileSplit) context.getInputSplit();
+            fileName = split.getPath().getName();
+            URI[] cacheFiles = context.getCacheFiles();
+            if (cacheFiles != null && cacheFiles.length > 0) {
+                String localFileName = new File(cacheFiles[0].getPath()).getName();
+                try (BufferedReader br = new BufferedReader(new FileReader(localFileName))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        stopWords.add(line.trim().toLowerCase());
+                    }
+                }
+            }
+        }
+
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+          lineNumber++; 
+          String cleanLine = value.toString().toLowerCase();
+          StringTokenizer itr = new StringTokenizer(cleanLine, "\"\',.()?![]#$*-;:_+/\\<>@%& ");
+          while (itr.hasMoreTokens()) {
+            String currentWord = itr.nextToken();
+            if (!stopWords.contains(currentWord)) {
+                word.set(currentWord);
+                documentAndLine.set(fileName + "@" + lineNumber);
+                context.write(word, documentAndLine);
+            }
+          }
+        }
+      }
+
+      public static class IndexGroupingReducer extends Reducer<Text, Text, Text, Text> {
+        private Text result = new Text();
+        public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+          Map<String, Set<String>> fileMap = new TreeMap<>();
+          for (Text val : values) {
+            String[] parts = val.toString().split("@");
+            if (parts.length == 2) {
+                String file = parts[0];
+                String line = parts[1];
+                fileMap.putIfAbsent(file, new LinkedHashSet<>()); 
+                fileMap.get(file).add(line);
+            }
+          }
+          StringBuilder finalOutput = new StringBuilder();
+          for (Map.Entry<String, Set<String>> entry : fileMap.entrySet()) {
+              finalOutput.append("(").append(entry.getKey()).append(", ")
+                         .append(String.join(", ", entry.getValue())).append(") ");
+          }
+          result.set(finalOutput.toString().trim());
+          context.write(key, result);
+        }
+      }
+
+      public static void main(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, "inverted index");
+        job.setJarByClass(InvertedIndex.class);
+        job.setMapperClass(TokenizerMapper.class);
+        job.setReducerClass(IndexGroupingReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        job.addCacheFile(new URI(args[2]));
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+      }
+    }
+
+  # 2. The Execution Script
+  run-job.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "=== STEP 0: Injecting IP-Routing Overrides ==="
+    mkdir -p /tmp/hadoop-config-override
+    cp -r /etc/hadoop/* /tmp/hadoop-config-override/ 2>/dev/null || true
+    
+    cat << 'EOF' > /tmp/hadoop-config-override/hdfs-site.xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <property><name>dfs.client.use.datanode.hostname</name><value>false</value></property>
+        <property><name>dfs.datanode.use.datanode.hostname</name><value>false</value></property>
+    </configuration>
+    EOF
+    
+    cat << 'EOF' > /tmp/hadoop-config-override/core-site.xml
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <property><name>fs.defaultFS</name><value>hdfs://namenode:9000</value></property>
+    </configuration>
+    EOF
+    
+    # Force all subsequent Hadoop commands in this script to use our override directory
+    export HADOOP_CONF_DIR=/tmp/hadoop-config-override
+
+    echo "=== STEP 1: Waiting for Seeder Job to Finish ==="
+    # This loop pings HDFS until the stopwords file exists, proving the seeder is done
+    until hdfs dfs -test -e /user/root/config/stopwords.txt; do
+      echo "Waiting for books and stopwords to be seeded into HDFS..."
+      sleep 10
+    done
+    echo "Seeder data detected!"
+
+    echo "=== STEP 2: Compiling Java Code ==="
+    mkdir -p /app
+    cp /scripts/InvertedIndex.java /app/
+    cd /app
+    javac -cp $(hadoop classpath) InvertedIndex.java
+    jar cf index.jar InvertedIndex*.class
+    echo "Compilation successful!"
+
+    echo "=== STEP 3: Cleaning Old Output ==="
+    hdfs dfs -rm -r /user/root/output 2>/dev/null || true
+
+    echo "=== STEP 4: Executing MapReduce Job ==="
+    # Note: We don't need HADOOP_CONF_DIR hack anymore because our helm values.yaml now injects the IP fixes globally!
+    hadoop jar index.jar InvertedIndex /user/root/input /user/root/output /user/root/config/stopwords.txt
+
+    echo "=== SUCCESS: Job Completed! ==="

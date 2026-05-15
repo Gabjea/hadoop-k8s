@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-mapreduce-executor
+  namespace: default
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+      - name: {{ .Values.global.imagePullSecret }}
+      containers:
+      - name: mapreduce-runner
+        image: "{{ .Values.global.registry }}/hadoop-namenode:latest" # Contains JDK and Hadoop CLI
+        command: ["/bin/bash", "/scripts/run-job.sh"]
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-hadoop-env
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+      volumes:
+      - name: script-volume
+        configMap:
+          name: {{ .Release.Name }}-mapreduce-script
+          defaultMode: 0755

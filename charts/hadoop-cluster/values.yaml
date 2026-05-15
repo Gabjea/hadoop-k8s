@@ -31,3 +31,7 @@ namenode:
 
 workers:
   hostPath: "/data/hadoop/data"
+
+seeder:
+  enabled: true
+  bookCount: 250 
