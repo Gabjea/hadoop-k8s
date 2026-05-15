@@ -33,8 +33,9 @@ spec:
       - name: historyserver
         image: "{{ .Values.global.registry }}/hadoop-historyserver:latest"
         env:
-        - name: HADOOP_OPTS
+        - name: YARN_OPTS
           value: "-Dyarn.timeline-service.store-class=org.apache.hadoop.yarn.server.timeline.FileSystemTimelineStore -Dyarn.timeline-service.fs-timeline-store.path=/yarn/timeline"
+
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-hadoop-env
