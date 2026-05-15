@@ -15,6 +15,9 @@ hadoopEnv:
   YARN_CONF_yarn_timeline___service_state___store___class: "org.apache.hadoop.yarn.server.timeline.recovery.FileSystemTimelineStateStore"
   YARN_CONF_yarn_timeline___service_fs___timeline___store_path: "/yarn/timeline"
 
+  HDFS_CONF_dfs_client_use_datanode_hostname: "false"
+  HDFS_CONF_dfs_datanode_use_datanode_hostname: "false"
+
 nodeRoles:
   masterKey: "node-role.kubernetes.io/master"
   masterValue: "true"

@@ -14,3 +14,5 @@ data:
   YARN_CONF_yarn_timeline___service_store___class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_store___class | quote }}
   YARN_CONF_yarn_timeline___service_state___store___class: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_state___store___class | quote }}
   YARN_CONF_yarn_timeline___service_fs___timeline___store_path: {{ .Values.hadoopEnv.YARN_CONF_yarn_timeline___service_fs___timeline___store_path | quote }}
+  HDFS_CONF_dfs_client_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_client_use_datanode_hostname | quote }}
+  HDFS_CONF_dfs_datanode_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_datanode_use_datanode_hostname | quote }}

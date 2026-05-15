@@ -32,8 +32,8 @@ spec:
       - name: datanode
         image: "{{ .Values.global.registry }}/hadoop-datanode:latest"
         env:
-        - name: HADOOP_OPTS
-          value: "-Ddfs.datanode.hostname=$(MY_POD_NAME).hadoop-workers-dns.default.svc.cluster.local"
+      #  - name: HADOOP_OPTS
+       #   value: "-Ddfs.datanode.hostname=$(MY_POD_NAME).hadoop-workers-dns.default.svc.cluster.local"
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:
