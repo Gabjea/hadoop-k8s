@@ -45,3 +45,4 @@ spec:
       - name: namenode-storage
         hostPath:
           path: {{ .Values.namenode.hostPath }}
+          type: DirectoryOrCreate

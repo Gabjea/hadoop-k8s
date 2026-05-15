@@ -38,7 +38,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        # ------------------------------------------------------------
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-hadoop-env
@@ -55,3 +54,4 @@ spec:
       - name: hdfs-data
         hostPath:
           path: {{ .Values.workers.hostPath }}
+          type: DirectoryOrCreate
