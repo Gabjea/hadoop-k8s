@@ -1,12 +1,54 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: resourcemanager 
+  name: resourcemanager
   namespace: default
 spec:
   clusterIP: None
   ports:
-  - port: 8088
-  - port: 8032 
+  - name: tracker
+    port: 8032
+  - name: web
+    port: 8088
   selector:
     app: resourcemanager
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resourcemanager-public
+  namespace: default
+spec:
+  ports:
+  - name: web
+    port: 8088
+    nodePort: 30888
+  type: NodePort
+  selector:
+    app: resourcemanager
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resourcemanager
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resourcemanager
+  template:
+    metadata:
+      labels:
+        app: resourcemanager
+    spec:
+      nodeSelector:
+        {{ .Values.nodeRoles.masterKey }}: {{ .Values.nodeRoles.masterValue | quote }}
+      imagePullSecrets:
+      - name: {{ .Values.global.imagePullSecret }}
+      containers:
+      - name: resourcemanager
+        image: "{{ .Values.global.registry }}/hadoop-resourcemanager:latest"
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-hadoop-env
