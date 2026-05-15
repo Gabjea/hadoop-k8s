@@ -9,11 +9,13 @@ hadoopEnv:
   clusterName: "hadoop-team-cluster"
   jobhistoryAddress: "historyserver:10020"
   jobhistoryWebappAddress: "historyserver:19888"
-
   JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-universal/"
 
-  HDFS_CONF_dfs_namenode_datanode_registration_ip__hostname__check: "false"
+  HDFS_CONF_dfs_namenode_datanode_registration_ip_hostname_check: "false"
   HDFS_CONF_dfs_datanode_use_datanode_hostname: "false"
+
+  HADOOP_OPTS: "-Ddfs.namenode.datanode.registration.ip.hostname.check=false -Ddfs.datanode.use.datanode.hostname=false"
+
 
 nodeRoles:
   masterKey: "node-role.kubernetes.io/master"

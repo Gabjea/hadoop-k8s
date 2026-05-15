@@ -1,5 +1,11 @@
 #!/bin/bash
 
+export HADOOP_OPTS="$HADOOP_OPTS -Ddfs.namenode.datanode.registration.ip.hostname.check=false -Ddfs.datanode.use.datanode.hostname=false"
+
+if [ -f /opt/hadoop/etc/hadoop/hadoop-env.sh ]; then
+    echo "export HADOOP_OPTS=\"\$HADOOP_OPTS -Ddfs.namenode.datanode.registration.ip.hostname.check=false -Ddfs.datanode.use.datanode.hostname=false\"" >> /opt/hadoop/etc/hadoop/hadoop-env.sh
+fi
+
 # Set some sensible defaults
 export CORE_CONF_fs_defaultFS=${CORE_CONF_fs_defaultFS:-hdfs://`hostname -f`:8020}
 

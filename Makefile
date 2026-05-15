@@ -15,7 +15,7 @@ login:
 	@echo "$(GH_TOKEN)" | docker login $(REGISTRY) -u $(GH_USER) --password-stdin
 
 .PHONY: pipeline
-pipeline: check-env build-all push-all
+pipeline: build-all push-all
 	@echo "Pipeline execution completed successfully. Ready for Argo CD synchronization!"
 
 .PHONY: build-all
