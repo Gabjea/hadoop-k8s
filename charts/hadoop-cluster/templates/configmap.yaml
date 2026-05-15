@@ -11,7 +11,3 @@ data:
   MAPRED_CONF_mapreduce_jobhistory_address: {{ .Values.hadoopEnv.jobhistoryAddress | quote }}
   MAPRED_CONF_mapreduce_jobhistory_webapp_address: {{ .Values.hadoopEnv.jobhistoryWebappAddress | quote }}
   JAVA_HOME: {{ .Values.hadoopEnv.JAVA_HOME | quote }}
-  
-  HDFS_CONF_dfs_namenode_datanode_registration_ip_hostname_check: {{ .Values.hadoopEnv.HDFS_CONF_dfs_namenode_datanode_registration_ip_hostname_check | quote }}
-  HDFS_CONF_dfs_datanode_use_datanode_hostname: {{ .Values.hadoopEnv.HDFS_CONF_dfs_datanode_use_datanode_hostname | quote }}
-  HADOOP_OPTS: {{ .Values.hadoopEnv.HADOOP_OPTS | quote }}
