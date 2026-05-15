@@ -13,20 +13,6 @@ spec:
   selector:
     app: namenode
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: namenode-public
-  namespace: default
-spec:
-  ports:
-  - name: web
-    port: 9870
-    nodePort: 30870
-  type: NodePort
-  selector:
-    app: namenode
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

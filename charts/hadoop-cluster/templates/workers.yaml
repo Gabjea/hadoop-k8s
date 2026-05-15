@@ -1,7 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hadoop-workers-dns
+  namespace: default
+spec:
+  clusterIP: None
+  selector:
+    app: worker
+  ports:
+  - name: dummy
+    port: 9999
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: hadoop-workers
+  namespace: default
 spec:
   selector:
     matchLabels:
@@ -11,16 +25,24 @@ spec:
       labels:
         app: worker
     spec:
-      nodeSelector:
-        {{ .Values.nodeRoles.workerKey }}: {{ .Values.nodeRoles.workerValue | quote }}
+      subdomain: "hadoop-workers-dns" 
       imagePullSecrets:
       - name: {{ .Values.global.imagePullSecret }}
       containers:
       - name: datanode
         image: "{{ .Values.global.registry }}/hadoop-datanode:latest"
+        env:
+        - name: HADOOP_OPTS
+          value: "-Ddfs.datanode.hostname=$(MY_POD_NAME).hadoop-workers-dns.default.svc.cluster.local"
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # ------------------------------------------------------------
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-hadoop-env
+
         volumeMounts:
         - name: hdfs-data
           mountPath: /hadoop/dfs/data
