@@ -49,7 +49,7 @@ data:
 
     for i in {1..{{ .Values.seeder.bookCount }}}; do
       # Download to a temporary file first (using || true so 404s don't crash the script)
-      wget -q -c "https://www.gutenberg.org/ebooks/${i}.txt.utf-8" -O temp.txt || true
+      curl -sL "https://www.gutenberg.org/ebooks/${i}.txt.utf-8" -o temp.txt || true
       
       # Check if the file actually downloaded and isn't empty
       if [ -s temp.txt ]; then
