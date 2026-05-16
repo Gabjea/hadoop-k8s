@@ -20,29 +20,23 @@ metadata:
 spec:
   serviceName: "namenode"
   replicas: {{ .Values.namenode.replicaCount }}
-  selector:
-    matchLabels:
-      app: namenode
   template:
     metadata:
       labels:
         app: namenode
+   template:
     spec:
-      nodeSelector:
-        {{ .Values.nodeRoles.masterKey }}: {{ .Values.nodeRoles.masterValue | quote }}
-      imagePullSecrets:
-      - name: {{ .Values.global.imagePullSecret }}
       containers:
-      - name: namenode
-        image: "{{ .Values.global.registry }}/hadoop-namenode:latest"
-        envFrom:
-        - configMapRef:
-            name: {{ .Release.Name }}-hadoop-env
-        volumeMounts:
-        - name: namenode-storage
-          mountPath: /hadoop/dfs/name
-      volumes:
-      - name: namenode-storage
-        hostPath:
-          path: {{ .Values.namenode.hostPath }}
-          type: DirectoryOrCreate
+        - name: datanode
+          volumeMounts:
+            - name: datanode-storage
+              mountPath: /hadoop/dfs/data
+  volumeClaimTemplates:           # <-- creates one PVC per replica automatically
+    - metadata:
+        name: datanode-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path   # your k3s storage class
+        resources:
+          requests:
+            storage: 20Gi
