@@ -5,9 +5,12 @@ metadata:
   namespace: default
 spec:
   ports:
-  - name: web
+  - name: jobhistory
     port: 19888
     nodePort: 31888 
+  - name: timeline-web
+    port: 8188
+    nodePort: 31188 
   type: NodePort
   selector:
     app: historyserver
@@ -37,4 +40,4 @@ spec:
             name: {{ .Release.Name }}-hadoop-env
         ports:
         - containerPort: 19888
-
+        - containerPort: 8188  
