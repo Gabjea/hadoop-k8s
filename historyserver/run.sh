@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Force the State Store to use FileSystem instead of LevelDB
+# The state store can safely remain FileSystem (it is pure Java)
 export YARN_CONF_yarn_timeline___service_state___store___class=org.apache.hadoop.yarn.server.timeline.recovery.FileSystemTimelineStateStore
 
-# Double check your store class is properly overriding the default
-export YARN_CONF_yarn_timeline___service_store___class=org.apache.hadoop.yarn.server.timeline.FileSystemTimelineStore
+# Fall back to the pure-Java memory store to bypass the M1 LevelDB native crash
+export YARN_CONF_yarn_timeline___service_store___class=org.apache.hadoop.yarn.server.timeline.MemoryTimelineStore
 
 $HADOOP_HOME/bin/yarn --config $HADOOP_CONF_DIR historyserver

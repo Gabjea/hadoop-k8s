@@ -51,6 +51,11 @@ hadoopEnv:
   YARN_CONF_yarn_nodemanager_remote___app___log___dir: "/app-logs"
   YARN_CONF_yarn_nodemanager_aux___services: "mapreduce_shuffle"
   
+  # === YARN TIMELINE & NODE MANAGER ===
+  YARN_CONF_yarn_timeline___service_bind___host: "0.0.0.0"
+  YARN_CONF_yarn_resourcemanager_bind___host: "0.0.0.0"
+  YARN_CONF_yarn_nodemanager_bind___host: "0.0.0.0"
+
   # === MAPREDUCE CONF (This is what pushes the job to YARN!) ===
   MAPRED_CONF_mapreduce_framework_name: "yarn"
   YARN_CONF_mapreduce_map_output_compress: "true"
@@ -77,7 +82,7 @@ namenode:
 
 workers:
   hostPath: "/data/hadoop/data"
-  
+
 seeder:
   enabled: true
   bookCount: 10 
